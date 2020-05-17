@@ -34,52 +34,72 @@ def get_data_fom_ING():
         i+=1  
 
 def get_data_fom_BCR():
-    
     driver.get('https://www.bcr.ro/ro/curs-valutar')
-    i=1
+    nr=[1,2,3,4]
     name="BCR"
-    while i<5:
-        a=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[2]')
-        x=a.text
-        b=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[3]')
-        y=b.text
-        c=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[4]')
-        z=c.text
-        d=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[1]/div')
+    for i in nr:
+        x=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[2]').text
+        y=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[3]').text
+        z=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[4]').text
         bkdb.insert(name,x,y,z)
-        i+=1
-
+        
 def get_data_fom_BT():
     driver.get('https://www.bancatransilvania.ro/curs-valutar-spot/')
     name="BT"
-    i=1
-    while i<5:
-        a=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[1]/span')
-        x=a.text
-        b=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[3]')
-        y=b.text
-        c = driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[4]')
-        z=c.text
+    nr=[1,2,3,4]
+    for i in nr:
+        x=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[1]/span').text
+        y=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[3]').text
+        z=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[4]').text
         bkdb.insert(name,x,y,z)
-        i+=1
 
-
-
-
-
-
+def get_data_from_BRD():
+    url='https://www.brd.ro/curs-valutar-si-dobanzi-de-referinta'
+    driver.get(url)
+    name="BRD"
+    nr = [2,3,4]
+    for i in nr:
+        x=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[2]/p['+str(i)+']').text
+        y=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[4]/p['+str(i)+']').text
+        z=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[5]/p['+str(i)+']').text
+        bkdb.insert(name,x,y,z)
+    r=requests.get(url)
+    c=r.content
+    soup=BeautifulSoup(c,"html.parser")
+    all=soup.find_all("div",{"class":"col-sm-2 hidden-xs"})
+    x=all[2].text.replace("\n","")[25:28]
+    all1=soup.find_all("div",{"class":"col-xs-4 col-sm-2"})
+    y=all1[0].text.replace(" ","").replace("\n","")[43:49]
+    z=all1[1].text.replace(" ","").replace("\n","")[43:49]
+    bkdb.insert(name,x,y,z)
+    
+def get_data_from_Unicredit():
+    driver.get('https://www.unicredit.ro/ro/institutional/Diverse/SchimbValutar.html')
+    name="Unicredit"
+    nr = [1,2,6,10]
+    for i in nr:
+        x=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[1]/a/strong').text
+        y=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[3]/div').text
+        z=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[4]/div').text
+        bkdb.insert(name,x,y,z)
+        
+def get_data_from_Raiffeisen():
+    driver.get('https://www.raiffeisen.ro/persoane-fizice/curs-valutar/')
+    name='Raiffeisen'
+    nr=[0,1,2,3]
+    for i in nr:
+        x=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[2]').text
+        y=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[4]').text
+        z=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[5]').text
+        bkdb.insert(name,x,y,z)
 
 def collect_data():
     get_data_fom_BCR()
     get_data_fom_ING()
     get_data_fom_BT()
-
-def view_all():
-    for row in bkdb.view_all():
-        tree.insert("",END,values=row)
-
-def delete_db():
-    bkdb.delete()
+    get_data_from_BRD()
+    get_data_from_Unicredit()
+    get_data_from_Raiffeisen()
 
 def clear_screen():
     for i in tree.get_children():
@@ -112,9 +132,8 @@ def populate_menu(w, **cmds):
     for name, func in cmds.items():
         menu.add_command(label=name, command=lambda name=name, func=func: func(name))
 
-
 window = tk.Tk()
-window.geometry("1350x600")
+window.geometry("245x180")
 window.title("Curs Valutar")
 
 variable = StringVar(window)
@@ -125,30 +144,18 @@ w.grid(row=1,column=1)
 
 populate_menu(w, EUR=eur, USD=usd, GBP=gbp, CHF=chf)
 
-tree= ttk.Treeview(window, height=30, column=("column1", "column2", "column3",), show='headings')
+tree= ttk.Treeview(window, height=6, column=("column1", "column2", "column3",), show='headings')
 tree.heading("#1", text="Banca")
-tree.column("#1", minwidth=0, width=300, stretch=True)
+tree.column("#1", minwidth=0, width=80, stretch=True, anchor=tk.CENTER)
 tree.heading("#2", text="Cumparare")
-tree.column("#2", minwidth=0, width=250, stretch=True, anchor=tk.CENTER)
+tree.column("#2", minwidth=0, width=80, stretch=True, anchor=tk.CENTER)
 tree.heading("#3", text="Vanzare")
-tree.column("#3", minwidth=0, width=250, stretch=True, anchor=tk.CENTER)
-tree.grid(row=2,column=1,rowspan=20,columnspan=10)
+tree.column("#3", minwidth=0, width=80, stretch=True, anchor=tk.CENTER)
+tree.grid(row=2,column=0,rowspan=6,columnspan=4)
 
 l1=tk.Label(window, text="Alege moneda")
 l1.grid(row=1,column=0)
 
-b0=tk.Button(window,text="View", command=view,width=15)
-b0.grid(row=1, column = 2)
-b1=tk.Button(window,text="Collect Data", command=collect_data,width=15)
-b1.grid(row=1, column = 3)
-b2=tk.Button(window,text="View All", command=view_all,width=15)
-
-# img=PhotoImage(file="img/EUR.gif")
-# tree.insert("",'end',image=img)
-
-#get_data_fom_ING()
-#get_data_fom_BCR()
-# bkdb.view_all()
-#bkdb.drop()
+collect_data()
 view()
 window.mainloop()

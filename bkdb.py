@@ -2,10 +2,6 @@ import sqlite3
 import pandas as pd
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-
-
-
-
 def connect():
     conn=sqlite3.connect("curs_valutar.db")
     return conn
@@ -24,35 +20,12 @@ def insert(nume_banca,moneda,cumpara,vinde):
     conn.commit()
     conn.close()
 
-def view_all():
-    conn=connect()
-    cur=conn.cursor()
-    cur.execute("SELECT nume_banca,cumpara,vinde FROM curs_valutar")
-    rows=cur.fetchall()
-    conn.close()
-    return rows
-
 def view(variable):
     conn=connect()
     cur=conn.cursor()
-    cur.execute("SELECT nume_banca,cumpara,vinde FROM curs_valutar where moneda=?",(variable,))
+    cur.execute("SELECT nume_banca,cumpara,vinde FROM curs_valutar where moneda like ?",('%'+variable+'%',))
     rows=cur.fetchall()
     conn.close()
     return rows
-
-def delete():
-    conn=connect()
-    cur=conn.cursor()
-    cur.execute("DELETE FROM curs_valutar")
-    conn.commit()
-    conn.close()
-
-def drop():
-   conn=connect()
-   cur=conn.cursor()
-   cur.execute("DROP TABLE curs_valutar")
-   conn.commit()
-   conn.close()
-
 
 create_table()
