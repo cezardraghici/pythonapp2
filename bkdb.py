@@ -28,4 +28,11 @@ def view(variable):
     conn.close()
     return rows
 
+def delete():
+    conn=connect()
+    cur=conn.cursor()
+    cur.execute("DELETE FROM curs_valutar")
+    conn.commit()
+    conn.close()
+
 create_table()

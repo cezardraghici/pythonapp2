@@ -8,12 +8,15 @@ import tkinter as tk
 from tkinter import *
 import tkinter.ttk as ttk 
 from tkinter import PhotoImage
+from tkinter import ttk
+from ttkthemes import ThemedTk
+
 
 driver="global"
 options = Options()
 options.add_argument('--headless')
 options.add_argument('--disable-gpu') 
-driver = webdriver.Chrome('C:\Windows drivers\chromedriver.exe',chrome_options=options)
+driver = webdriver.Chrome('Windows drivers\chromedriver.exe',chrome_options=options)
 bkdb.delete()
 
 def get_data_fom_ING():
@@ -132,14 +135,15 @@ def populate_menu(w, **cmds):
     for name, func in cmds.items():
         menu.add_command(label=name, command=lambda name=name, func=func: func(name))
 
-window = tk.Tk()
-window.geometry("245x180")
+window = ThemedTk(theme="equilux")
+window.geometry("240x180")
+window.configure(bg='#424141')
 window.title("Curs Valutar")
 
 variable = StringVar(window)
 variable.set("EUR") 
 
-w = OptionMenu(window, variable, ())
+w = ttk.OptionMenu(window, variable, ())
 w.grid(row=1,column=1)
 
 populate_menu(w, EUR=eur, USD=usd, GBP=gbp, CHF=chf)
@@ -153,7 +157,7 @@ tree.heading("#3", text="Vanzare")
 tree.column("#3", minwidth=0, width=80, stretch=True, anchor=tk.CENTER)
 tree.grid(row=2,column=0,rowspan=6,columnspan=4)
 
-l1=tk.Label(window, text="Alege moneda")
+l1=ttk.Label(window, text="Alege moneda")
 l1.grid(row=1,column=0)
 
 collect_data()
