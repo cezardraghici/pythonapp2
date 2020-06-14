@@ -7,10 +7,10 @@ from selenium.webdriver.chrome.options import Options
 import tkinter as tk
 from tkinter import *
 import tkinter.ttk as ttk 
-from tkinter import PhotoImage
 from tkinter import ttk
 from ttkthemes import ThemedTk
-
+from datetime import datetime
+import time
 
 driver="global"
 options = Options()
@@ -18,6 +18,9 @@ options.add_argument('--headless')
 options.add_argument('--disable-gpu') 
 driver = webdriver.Chrome('Windows drivers\chromedriver.exe',chrome_options=options)
 bkdb.delete()
+cr_data = 'global'
+cr_data = datetime.today()
+#cr_data = bkdb.data()
 
 def get_data_fom_ING():
     r=requests.get("https://ing.ro/ing-in-romania/informatii-utile/curs-valutar")
@@ -33,7 +36,7 @@ def get_data_fom_ING():
         z=all1[1].text.replace(" ","").replace("\n","")
         all2=soup.find_all("td",{"class":"code"})
         x=all2[i].text.replace(" ","").replace("\n","")
-        bkdb.insert(name,x,y,z)
+        bkdb.insert(name,x,y,z,cr_data)
         i+=1  
 
 def get_data_fom_BCR():
@@ -41,10 +44,14 @@ def get_data_fom_BCR():
     nr=[1,2,3,4]
     name="BCR"
     for i in nr:
+        print(i)
         x=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[2]').text
+        print(driver.find_element_by_xpath('/html/body/div[3]/main/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr[1]/td[3]'))
         y=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[3]').text
+        print(y)
         z=driver.find_element_by_xpath('//*[@id="content"]/div[5]/div/div/div/div/div[1]/div/div/div/table/tbody/tr['+str(i)+']/td[4]').text
-        bkdb.insert(name,x,y,z)
+        print(z)
+        bkdb.insert(name,x,y,z,cr_data)
         
 def get_data_fom_BT():
     driver.get('https://www.bancatransilvania.ro/curs-valutar-spot/')
@@ -54,7 +61,7 @@ def get_data_fom_BT():
         x=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[1]/span').text
         y=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[3]').text
         z=driver.find_element_by_xpath('/html/body/section/div[1]/div[2]/table[2]/tbody/tr['+str(i)+']/td[4]').text
-        bkdb.insert(name,x,y,z)
+        bkdb.insert(name,x,y,z,cr_data)
 
 def get_data_from_BRD():
     url='https://www.brd.ro/curs-valutar-si-dobanzi-de-referinta'
@@ -65,16 +72,16 @@ def get_data_from_BRD():
         x=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[2]/p['+str(i)+']').text
         y=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[4]/p['+str(i)+']').text
         z=driver.find_element_by_xpath('//*[@id="tabAccountExchangeRates"]/div/div[5]/p['+str(i)+']').text
-        bkdb.insert(name,x,y,z)
+        bkdb.insert(name,x,y,z,cr_data)
     r=requests.get(url)
     c=r.content
     soup=BeautifulSoup(c,"html.parser")
     all=soup.find_all("div",{"class":"col-sm-2 hidden-xs"})
-    x=all[2].text.replace("\n","")[25:28]
+    x=all[2].text.replace("\n","")[43:46]
     all1=soup.find_all("div",{"class":"col-xs-4 col-sm-2"})
-    y=all1[0].text.replace(" ","").replace("\n","")[43:49]
-    z=all1[1].text.replace(" ","").replace("\n","")[43:49]
-    bkdb.insert(name,x,y,z)
+    y=all1[0].text.replace(" ","").replace("\n","")[79:85]
+    z=all1[1].text.replace(" ","").replace("\n","")[79:85]
+    bkdb.insert(name,x,y,z,cr_data)
     
 def get_data_from_Unicredit():
     driver.get('https://www.unicredit.ro/ro/institutional/Diverse/SchimbValutar.html')
@@ -84,7 +91,7 @@ def get_data_from_Unicredit():
         x=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[1]/a/strong').text
         y=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[3]/div').text
         z=driver.find_element_by_xpath('//*[@id="currency_list_table"]/tr['+str(i)+']/td[4]/div').text
-        bkdb.insert(name,x,y,z)
+        bkdb.insert(name,x,y,z,cr_data)
         
 def get_data_from_Raiffeisen():
     driver.get('https://www.raiffeisen.ro/persoane-fizice/curs-valutar/')
@@ -94,7 +101,7 @@ def get_data_from_Raiffeisen():
         x=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[2]').text
         y=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[4]').text
         z=driver.find_element_by_xpath('//*[@id="_'+str(i)+'"]/td[5]').text
-        bkdb.insert(name,x,y,z)
+        bkdb.insert(name,x,y,z,cr_data)
 
 def collect_data():
     get_data_fom_BCR()
@@ -136,7 +143,7 @@ def populate_menu(w, **cmds):
         menu.add_command(label=name, command=lambda name=name, func=func: func(name))
 
 window = ThemedTk(theme="equilux")
-window.geometry("240x180")
+window.geometry("260x220")
 window.configure(bg='#424141')
 window.title("Curs Valutar")
 
@@ -159,6 +166,10 @@ tree.grid(row=2,column=0,rowspan=6,columnspan=4)
 
 l1=ttk.Label(window, text="Alege moneda")
 l1.grid(row=1,column=0)
+
+data = bkdb.data()
+l2=ttk.Label(window, text=data)
+l2.grid(row=1, column=3)
 
 collect_data()
 view()

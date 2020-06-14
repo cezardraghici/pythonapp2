@@ -9,14 +9,14 @@ def connect():
 def create_table():
     conn=connect()
     cur=conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS curs_valutar (id INTEGER PRIMARY KEY AUTOINCREMENT, nume_banca text, moneda text, cumpara text, vinde text)")
+    cur.execute("CREATE TABLE IF NOT EXISTS curs_valutar (id INTEGER PRIMARY KEY AUTOINCREMENT, nume_banca text, moneda text, cumpara text, vinde text, cr_data text)")
     conn.commit()
     conn.close()
 
-def insert(nume_banca,moneda,cumpara,vinde):
+def insert(nume_banca,moneda,cumpara,vinde,cr_data):
     conn=connect()
     cur=conn.cursor()
-    cur.execute("INSERT INTO curs_valutar (nume_banca,moneda,cumpara,vinde) VALUES (?,?,?,?)",(nume_banca,moneda,cumpara,vinde))
+    cur.execute("INSERT INTO curs_valutar (nume_banca,moneda,cumpara,vinde,cr_data) VALUES (?,?,?,?,?)",(nume_banca,moneda,cumpara,vinde,cr_data))
     conn.commit()
     conn.close()
 
@@ -35,4 +35,20 @@ def delete():
     conn.commit()
     conn.close()
 
+def data():
+    conn=connect()
+    cur=conn.cursor()
+    cur.execute("Select max(date(cr_data)) from curs_valutar")
+    row=cur.fetchall()
+    conn.close()
+    return row
+
+def drop():
+    conn=connect()
+    cur=conn.cursor()
+    cur.execute("DROP TABLE curs_valutar")
+    conn.commit()
+    conn.close()
+
+#drop()
 create_table()
